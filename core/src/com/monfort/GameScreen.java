@@ -1,11 +1,13 @@
 package com.monfort;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -14,6 +16,10 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 public class GameScreen implements Screen {
     private static final float WORLD_WIDTH = 800;
     private static final float WORLD_HEIGHT = 600;
+
+    private static final int TITLE_BAR = 35;
+
+    private static final int XGUTTER = 10;
 
     //Object that allows us to draw all our graphics
     private SpriteBatch spriteBatch;
@@ -28,10 +34,11 @@ public class GameScreen implements Screen {
     //zoom in/out? Keep everything scaled?
     private Viewport viewport;
 
-    private Texture emptyTile;
-    private Texture questionTile;
-    private Texture bombTile;
-    private Texture emptyFloor;
+    GameBoard board = new GameBoard(WORLD_HEIGHT, WORLD_WIDTH);
+
+    private int mouseX = -10;
+    private int mouseY = -10;
+    BitmapFont tempFont = new BitmapFont();
 
     public void clearScreen(){
         Gdx.gl.glClearColor(0,0,0,1);
@@ -51,16 +58,25 @@ public class GameScreen implements Screen {
 
         shapeRenderer = new ShapeRenderer();
         shapeRenderer.setAutoShapeType(true); //???, I just know that this was the solution to an annoying problem
+    }
 
-        emptyTile = new Texture("emptyTile.jpeg");
+    public void handleClick(){
+        if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
+            mouseX = Gdx.input.getX();
+            mouseY = Gdx.input.getY();
+
+            board.handleClick(mouseX, mouseY);
+        }
     }
 
     @Override
     public void render(float delta) {
         clearScreen();
 
+        handleClick();
         spriteBatch.begin();
-        spriteBatch.draw(emptyTile, 300,300);
+        board.draw(spriteBatch);
+        tempFont.draw(spriteBatch, "Row: " + ((mouseY-10)/25) + " \nColumn: " + ((mouseX-10)/25), 400, 100);
         spriteBatch.end();
     }
 

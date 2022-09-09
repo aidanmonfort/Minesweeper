@@ -29,8 +29,8 @@ public class GameBoard {
     private Texture bombTile;
     private Texture emptyFloor;
     private Texture bomb;
-
-    private Texture oneTile, twoTile, threeTile, fourTile, fiveTile, sixTile, sevenTile, eightTile;
+    
+    private Texture[] numTiles;
 
     private static final int BOMB = 9, EMPTY_TILE = 10, FLAGGED_TILE = 20, QUESTION_TILE = 30;
 
@@ -50,6 +50,17 @@ public class GameBoard {
         return neigh;
     }
 
+    private int countBombs(Location loc){
+        ArrayList<Location> neighbors = getNeigh(loc);
+        int count = 0;
+        for(Location l : neighbors){
+            if(board[l.row][l.col]%10 == BOMB){
+                count++;
+            }
+        }
+        return count;
+    }
+
     public void handleClick(int x, int y){
         int row = (y-10)/25;
         int col = (x-10)/25;
@@ -61,7 +72,7 @@ public class GameBoard {
         if(!clicked){
             clicked = true;
             placeBomb(loc);
-            getNeigh(loc);
+            generateNumbers();
         }
     }
 
@@ -73,14 +84,15 @@ public class GameBoard {
 
         emptyTile = new Texture("emptyTile.jpeg");
         bomb = new Texture("bomb.jpg");
-        oneTile = new Texture("oneTile.jpg");
-        twoTile = new Texture("twoTile.jpg");
-        threeTile = new Texture("threeTile.jpg");
-        fourTile = new Texture("fourTile.jpg");
-        fiveTile = new Texture("fiveTile.jpg");
-        sixTile = new Texture("sixTile.jpg");
-        sevenTile = new Texture("sevenTile.jpg");
-        eightTile = new Texture("eightTile.jpg");
+        numTiles = new Texture[8];
+        numTiles[0] = new Texture("oneTile.jpg");
+        numTiles[1] = new Texture("twoTile.jpg");
+        numTiles[2] = new Texture("threeTile.jpg");
+        numTiles[3] = new Texture("fourTile.jpg");
+        numTiles[4] = new Texture("fiveTile.jpg");
+        numTiles[5] = new Texture("sixTile.jpg");
+        numTiles[6] = new Texture("sevenTile.jpg");
+        numTiles[7] = new Texture("eightTile.jpg");
     }
 
     private void initEmptyBoard(){
@@ -91,7 +103,16 @@ public class GameBoard {
         }
     }
 
-
+    private void generateNumbers(){
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[i].length; j++) {
+                if(board[i][j]%10 != BOMB){
+                    int numBombs = countBombs(new Location(i, j));
+                    board[i][j] = numBombs + 10;
+                }
+            }
+        }
+    }
 
     private void placeBomb(Location loc){
         int bombCount = 0;
@@ -117,6 +138,9 @@ public class GameBoard {
                     spriteBatch.draw(emptyTile, 10 + (j * 25), height - 35 - (i * 25));
                 } else if (board[i][j] == BOMB) {
                     spriteBatch.draw(bomb, 10 + (j * 25), height - 35 - (i * 25));
+                }
+                else if (board[i][j] > 0 && board[i][j] < 9){
+                    spriteBatch.draw(numTiles[board[i][j]-1], 10 + (j * 25), height - 35 - (i * 25));
                 }
             }
         }

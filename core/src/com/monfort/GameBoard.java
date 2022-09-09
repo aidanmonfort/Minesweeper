@@ -29,7 +29,7 @@ public class GameBoard {
     private Texture bombTile;
     private Texture emptyFloor;
     private Texture bomb;
-    
+
     private Texture[] numTiles;
 
     private static final int BOMB = 9, EMPTY_TILE = 10, FLAGGED_TILE = 20, QUESTION_TILE = 30;
@@ -43,7 +43,7 @@ public class GameBoard {
         for(int i = loc.row - 1; i <= loc.row+1; i++){
             for(int j = loc.col-1; j <= loc.col+1;j++){
                 if(isValidLoc(new Location(i, j))){
-                    if(i != loc.row || loc.col != j) neigh.add(new Location(i, j));
+                    if((i != loc.row || loc.col != j) && board[i][j] != 0) neigh.add(new Location(i, j));
                 }
             }
         }
@@ -61,18 +61,32 @@ public class GameBoard {
         return count;
     }
 
+    private void reveal(Location loc){
+        board[loc.row][loc.col] %= 10;
+        if(board[loc.row][loc.col] < 9 && board[loc.row][loc.col] != 0){
+            return;
+        }
+        else if(board[loc.row][loc.col] == 0){
+            ArrayList<Location> neighs = getNeigh(loc);
+            for (int i = 0; i < neighs.size(); i++) {
+                reveal(neighs.get(i));
+            }
+        }
+    }
+
     public void handleClick(int x, int y){
         int row = (y-10)/25;
         int col = (x-10)/25;
         Location loc = new Location(row, col);
-
         if(isValidLoc(loc)){
-            board[row][col] %= 10;
-        }
-        if(!clicked){
-            clicked = true;
-            placeBomb(loc);
-            generateNumbers();
+            if(!clicked){
+                clicked = true;
+                placeBomb(loc);
+                generateNumbers();
+            }
+            if(board[loc.row][loc.col] > BOMB) {
+                reveal(loc);
+            }
         }
     }
 

@@ -34,7 +34,7 @@ public class GameScreen implements Screen {
     //zoom in/out? Keep everything scaled?
     private Viewport viewport;
 
-    GameBoard board = new GameBoard(WORLD_HEIGHT, WORLD_WIDTH);
+    GameBoard board = new GameBoard(WORLD_HEIGHT);
 
     private int mouseX = -10;
     private int mouseY = -10;

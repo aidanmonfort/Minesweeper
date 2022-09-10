@@ -14,8 +14,7 @@ class Location{
     }
 
     public String toString(){
-        String s = "Row: " + row + " Col: " + col;
-        return s;
+        return "[ " + row + " ]" + " [ " + col + " ]";
     }
 }
 
@@ -23,7 +22,6 @@ public class GameBoard {
     private int[][] board;
     private boolean clicked = false;
     private final float height;
-    private final float width;
     private Texture emptyTile;
     private Texture questionTile;
     private Texture bombTile;
@@ -63,10 +61,7 @@ public class GameBoard {
 
     private void reveal(Location loc){
         board[loc.row][loc.col] %= 10;
-        if(board[loc.row][loc.col] < 9 && board[loc.row][loc.col] != 0){
-            return;
-        }
-        else if(board[loc.row][loc.col] == 0){
+        if(board[loc.row][loc.col] == 0){
             ArrayList<Location> neighs = getNeigh(loc);
             for (int i = 0; i < neighs.size(); i++) {
                 reveal(neighs.get(i));
@@ -90,8 +85,7 @@ public class GameBoard {
         }
     }
 
-    public GameBoard(float height, float width){
-        this.width = width;
+    public GameBoard(float height){
         this.height = height;
         board = new int[16][30];
         initEmptyBoard();
@@ -141,8 +135,6 @@ public class GameBoard {
                 }
             }
         }
-
-        System.out.println("Bombs Placed: " + bombCount);
     }
 
     public void draw(SpriteBatch spriteBatch){

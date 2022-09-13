@@ -19,18 +19,22 @@ class Location{
 }
 
 public class GameBoard {
+    private boolean lost = false;
     private int[][] board;
     private boolean clicked = false;
     private final float height;
     private Texture emptyTile;
-    private Texture questionTile;
-    private Texture bombTile;
+    private Texture flagTile;
     private Texture emptyFloor;
     private Texture bomb;
 
     private Texture[] numTiles;
 
     private static final int BOMB = 9, EMPTY_TILE = 10, FLAGGED_TILE = 20, QUESTION_TILE = 30;
+
+    public boolean getL(){
+        return lost;
+    }
 
     private boolean isValidLoc(Location loc){
         return (loc.row >= 0 && loc.row < board.length) && (loc.col >= 0 && loc.col < board[0].length);
@@ -78,9 +82,29 @@ public class GameBoard {
                 clicked = true;
                 placeBomb(loc);
                 generateNumbers();
-            }
-            if(board[loc.row][loc.col] > BOMB) {
                 reveal(loc);
+            }
+            else if(board[loc.row][loc.col] > BOMB) {
+                if(board[loc.row][loc.col] >= FLAGGED_TILE){
+                    board[loc.row][loc.col] -= 10;
+                }
+                else{
+                    reveal(loc);
+                }
+            }
+            if(board[loc.row][loc.col] == BOMB){
+                lost = true;
+            }
+        }
+    }
+
+    public void handleRightClick(int x, int y){
+        int row = (y-10)/25;
+        int col = (x-10)/25;
+        Location loc = new Location(row, col);
+        if(isValidLoc(loc)){
+            if(board[loc.row][loc.col] >= EMPTY_TILE){
+                board[loc.row][loc.col] += (board[loc.row][loc.col] < FLAGGED_TILE) ? 10 : -10;
             }
         }
     }
@@ -92,6 +116,8 @@ public class GameBoard {
 
         emptyTile = new Texture("emptyTile.jpeg");
         bomb = new Texture("bomb.jpg");
+        flagTile = new Texture("flagTile.jpg");
+        emptyFloor = new Texture("emptyFloor.jpg");
         numTiles = new Texture[8];
         numTiles[0] = new Texture("oneTile.jpg");
         numTiles[1] = new Texture("twoTile.jpg");
@@ -122,16 +148,31 @@ public class GameBoard {
         }
     }
 
+    private boolean arrCont(ArrayList<Location> locs, Location loc){
+        for(int i = 0; i < locs.size(); i++){
+            if(locs.get(i).row == loc.row && locs.get(i).col == loc.col){
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void placeBomb(Location loc){
         int bombCount = 0;
+        ArrayList<Location> neighs = getNeigh(loc);
         while(bombCount < 99){
             int randRow = (int)(Math.random() * board.length);
             int randCol = (int)(Math.random() * board[0].length);
 
             if(randRow != loc.row && randCol != loc.col){
-                if(board[randRow][randCol] == EMPTY_TILE){
-                    board[randRow][randCol] = BOMB + 10;
-                    bombCount++;
+                Location chosen = new Location(randRow, randCol);
+                boolean cont = arrCont(neighs, chosen);
+                if(!cont){
+                    if(board[randRow][randCol] == EMPTY_TILE){
+                        board[randRow][randCol] = BOMB + 10;
+                        bombCount++;
+                    }
+
                 }
             }
         }
@@ -142,11 +183,18 @@ public class GameBoard {
             for (int j = 0; j < board[i].length; j++) {
                 if(board[i][j] >= EMPTY_TILE && board[i][j] < FLAGGED_TILE){
                     spriteBatch.draw(emptyTile, 10 + (j * 25), height - 35 - (i * 25));
-                } else if (board[i][j] == BOMB) {
+                }
+                else if (board[i][j] == BOMB) {
                     spriteBatch.draw(bomb, 10 + (j * 25), height - 35 - (i * 25));
                 }
                 else if (board[i][j] > 0 && board[i][j] < 9){
                     spriteBatch.draw(numTiles[board[i][j]-1], 10 + (j * 25), height - 35 - (i * 25));
+                }
+                else if(board[i][j] >= FLAGGED_TILE){
+                    spriteBatch.draw(flagTile, 10 + (j * 25), height - 35 - (i * 25));
+                }
+                else{
+                    spriteBatch.draw(emptyFloor, 10 + (j * 25), height - 35 - (i * 25));
                 }
             }
         }

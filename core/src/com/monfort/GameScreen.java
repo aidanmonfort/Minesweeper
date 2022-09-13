@@ -61,23 +61,32 @@ public class GameScreen implements Screen {
     }
 
     public void handleClick(){
-        if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
-            mouseX = Gdx.input.getX();
-            mouseY = Gdx.input.getY();
-
+        mouseX = Gdx.input.getX();
+        mouseY = Gdx.input.getY();
+        if(Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)){
             board.handleClick(mouseX, mouseY);
         }
+        else if(Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)){
+            board.handleRightClick(mouseX, mouseY);
+        }
+
     }
 
     @Override
     public void render(float delta) {
-        clearScreen();
-
-        handleClick();
-        spriteBatch.begin();
-        board.draw(spriteBatch);
-        tempFont.draw(spriteBatch, "Row: " + ((mouseY-10)/25) + " \nColumn: " + ((mouseX-10)/25), 400, 100);
-        spriteBatch.end();
+        if(!board.getL()){
+            handleClick();
+            spriteBatch.begin();
+            board.draw(spriteBatch);
+            spriteBatch.end();
+        }
+        else{
+            clearScreen();
+            spriteBatch.begin();
+            tempFont.getData().setScale(5);
+            tempFont.draw(spriteBatch, "Get better", 250, 350);
+            spriteBatch.end();
+        }
     }
 
     @Override

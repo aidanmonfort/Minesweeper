@@ -74,19 +74,10 @@ public class GameScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        if(!board.getL()){
-            handleClick();
-            spriteBatch.begin();
-            board.draw(spriteBatch);
-            spriteBatch.end();
-        }
-        else{
-            clearScreen();
-            spriteBatch.begin();
-            tempFont.getData().setScale(5);
-            tempFont.draw(spriteBatch, "Get better", 250, 350);
-            spriteBatch.end();
-        }
+        handleClick();
+        spriteBatch.begin();
+        board.draw(spriteBatch);
+        spriteBatch.end();
     }
 
     @Override

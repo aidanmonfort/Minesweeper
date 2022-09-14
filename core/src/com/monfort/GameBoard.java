@@ -1,6 +1,7 @@
 package com.monfort;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import java.util.ArrayList;
@@ -32,15 +33,12 @@ public class GameBoard {
 
     private static final int BOMB = 9, EMPTY_TILE = 10, FLAGGED_TILE = 20, QUESTION_TILE = 30;
 
-    public boolean getL(){
-        return lost;
-    }
 
     private boolean isValidLoc(Location loc){
         return (loc.row >= 0 && loc.row < board.length) && (loc.col >= 0 && loc.col < board[0].length);
     }
 
-    private ArrayList<Location> getNeigh(Location loc){
+    private ArrayList<Location> getNeigh( Location loc){
         ArrayList<Location> neigh = new ArrayList<>();
         for(int i = loc.row - 1; i <= loc.row+1; i++){
             for(int j = loc.col-1; j <= loc.col+1;j++){
@@ -74,26 +72,29 @@ public class GameBoard {
     }
 
     public void handleClick(int x, int y){
-        int row = (y-10)/25;
-        int col = (x-10)/25;
-        Location loc = new Location(row, col);
-        if(isValidLoc(loc)){
-            if(!clicked){
-                clicked = true;
-                placeBomb(loc);
-                generateNumbers();
-                reveal(loc);
-            }
-            else if(board[loc.row][loc.col] > BOMB) {
-                if(board[loc.row][loc.col] >= FLAGGED_TILE){
-                    board[loc.row][loc.col] -= 10;
-                }
-                else{
+        if(!lost){
+            int row = (y-10)/25;
+            int col = (x-10)/25;
+            Location loc = new Location(row, col);
+            if(isValidLoc(loc)){
+                if(!clicked){
+                    clicked = true;
+                    placeBomb(loc);
+                    generateNumbers();
                     reveal(loc);
                 }
-            }
-            if(board[loc.row][loc.col] == BOMB){
-                lost = true;
+                else if(board[loc.row][loc.col] > BOMB) {
+                    if(board[loc.row][loc.col] >= FLAGGED_TILE){
+                        board[loc.row][loc.col] -= 10;
+                    }
+                    else{
+                        reveal(loc);
+                    }
+                }
+                if(board[loc.row][loc.col] == BOMB){
+                    lost = true;
+                    revealBombs();
+                }
             }
         }
     }
@@ -178,6 +179,14 @@ public class GameBoard {
         }
     }
 
+    private void revealBombs(){
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[i].length; j++) {
+                board[i][j] = (board[i][j]%10 == 9) ? 9 : board[i][j];
+            }
+        }
+    }
+
     public void draw(SpriteBatch spriteBatch){
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
@@ -197,6 +206,11 @@ public class GameBoard {
                     spriteBatch.draw(emptyFloor, 10 + (j * 25), height - 35 - (i * 25));
                 }
             }
+        }
+        if(lost){
+            BitmapFont font = new BitmapFont();
+            font.getData().setScale(3);
+            font.draw(spriteBatch, "You Lost lol", 300, 150);
         }
     }
 }

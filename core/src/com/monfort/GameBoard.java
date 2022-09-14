@@ -84,7 +84,7 @@ public class GameBoard {
     public void handleClick(int x, int y){
         if(!lost && !won){
             int row = (y-10)/25;
-            int col = (x-10)/25;
+            int col = (x-27)/25;
             Location loc = new Location(row, col);
             if(isValidLoc(loc)){
                 if(!clicked){
@@ -112,7 +112,7 @@ public class GameBoard {
 
     public void handleRightClick(int x, int y){
         int row = (y-10)/25;
-        int col = (x-10)/25;
+        int col = (x-27)/25;
         Location loc = new Location(row, col);
         if(isValidLoc(loc)){
             if(board[loc.row][loc.col] >= EMPTY_TILE){
@@ -202,19 +202,19 @@ public class GameBoard {
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
                 if(board[i][j] >= EMPTY_TILE && board[i][j] < FLAGGED_TILE){
-                    spriteBatch.draw(emptyTile, 10 + (j * 25), height - 35 - (i * 25));
+                    spriteBatch.draw(emptyTile, 27 + (j * 25), height - 35 - (i * 25));
                 }
                 else if (board[i][j] == BOMB) {
-                    spriteBatch.draw(bomb, 10 + (j * 25), height - 35 - (i * 25));
+                    spriteBatch.draw(bomb, 27 + (j * 25), height - 35 - (i * 25));
                 }
                 else if (board[i][j] > 0 && board[i][j] < 9){
-                    spriteBatch.draw(numTiles[board[i][j]-1], 10 + (j * 25), height - 35 - (i * 25));
+                    spriteBatch.draw(numTiles[board[i][j]-1], 27 + (j * 25), height - 35 - (i * 25));
                 }
                 else if(board[i][j] >= FLAGGED_TILE){
-                    spriteBatch.draw(flagTile, 10 + (j * 25), height - 35 - (i * 25));
+                    spriteBatch.draw(flagTile, 27 + (j * 25), height - 35 - (i * 25));
                 }
                 else{
-                    spriteBatch.draw(emptyFloor, 10 + (j * 25), height - 35 - (i * 25));
+                    spriteBatch.draw(emptyFloor, 27 + (j * 25), height - 35 - (i * 25));
                 }
             }
         }

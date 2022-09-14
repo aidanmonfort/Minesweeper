@@ -3,7 +3,6 @@ package com.monfort;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-
 import java.util.ArrayList;
 
 class Location{
@@ -21,6 +20,7 @@ class Location{
 
 public class GameBoard {
     private boolean lost = false;
+    private boolean won = false;
     private int[][] board;
     private boolean clicked = false;
     private final float height;
@@ -71,8 +71,18 @@ public class GameBoard {
         }
     }
 
+    private boolean checkWon(){
+        int numUncovered = 0;
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[i].length; j++) {
+                numUncovered += (board[i][j] < 9) ? 1 : 0;
+            }
+        }
+        return numUncovered == (16 * 30) - 99;
+    }
+
     public void handleClick(int x, int y){
-        if(!lost){
+        if(!lost && !won){
             int row = (y-10)/25;
             int col = (x-10)/25;
             Location loc = new Location(row, col);
@@ -95,6 +105,7 @@ public class GameBoard {
                     lost = true;
                     revealBombs();
                 }
+                won = checkWon();
             }
         }
     }
@@ -207,10 +218,13 @@ public class GameBoard {
                 }
             }
         }
+        BitmapFont font = new BitmapFont();
+        font.getData().setScale(3);
         if(lost){
-            BitmapFont font = new BitmapFont();
-            font.getData().setScale(3);
             font.draw(spriteBatch, "You Lost lol", 300, 150);
+        }
+        if(won){
+            font.draw(spriteBatch, "Congrats you won!", 270, 150);
         }
     }
 }
